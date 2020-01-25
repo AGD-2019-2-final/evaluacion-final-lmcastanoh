@@ -12,3 +12,14 @@ fs -rm -f -r output;
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+data = LOAD 'data.tsv' USING PigStorage('\t') AS (primer:CHARARRAY, segundo:BAG{tup:TUPLE(letter:CHARARRAY)}, tercero:CHARARRAY);
+
+data_2 = FOREACH data GENERATE FLATTEN(segundo) AS segundo;
+
+conteo = GROUP data_2 BY segundo;
+
+--grouped = GROUP letters BY letter;
+
+wordcount = FOREACH conteo GENERATE group, COUNT($1);
+
+STORE wordcount INTO 'output';
